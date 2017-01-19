@@ -33,4 +33,9 @@ defmodule Stack.Server do
   def handle_cast({:push, item}, current_stack) do
     { :noreply, [item|current_stack] }
   end
+
+  def terminate(reason, stack) do
+    IO.puts(reason)
+    IO.puts("Stack was #{stack}")
+  end
 end
