@@ -4,8 +4,8 @@ defmodule Stack.Server do
   #####
   # External API
 
-  def start_link(current_stack) do
-    GenServer.start_link(__MODULE__, current_stack, name: __MODULE__)
+  def start_link(stash_pid) do
+    GenServer.start_link(__MODULE__, stash_pid, name: __MODULE__)
   end
 
   def pop do
@@ -23,19 +23,25 @@ defmodule Stack.Server do
   #####
   # GenServer implementation
 
-  def handle_call(:pop, _from, [head|tail]) do
-    { :reply, head, tail }
-  end
-  def handle_call(:dump, _from, stack) do
-    { :reply, stack, stack }
+  def init(stash_pid) do
+    current_stack = Stack.Stash.get_stack stash_pid
+    { :ok, {current_stack, stash_pid} }
   end
 
-  def handle_cast({:push, item}, current_stack) do
-    { :noreply, [item|current_stack] }
+  def handle_call(:pop, _from, {[head|tail], stash_pid}) do
+    { :reply, head, {tail, stash_pid} }
+  end
+  def handle_call(:dump, _from, {current_stack, stash_pid}) do
+    { :reply, current_stack, {current_stack, stash_pid} }
   end
 
-  def terminate(reason, stack) do
+  def handle_cast({:push, item}, {current_stack, stash_pid}) do
+    { :noreply, {[item|current_stack], stash_pid} }
+  end
+
+  def terminate(reason, {current_stack, stash_pid}) do
+    Stack.Stash.save_stack stash_pid, current_stack
     IO.puts(reason)
-    IO.puts("Stack was #{stack}")
+    IO.puts("Stack was #{current_stack}")
   end
 end
