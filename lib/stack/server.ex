@@ -8,14 +8,57 @@ defmodule Stack.Server do
     GenServer.start_link(__MODULE__, stash_pid, name: __MODULE__)
   end
 
+  @doc """
+  Set the stack with the passed list. Overwrites previous stack.
+
+  ## Examples
+
+      iex> Stack.Server.set [5, "cat", 9]
+      iex> Stack.Server.inspect
+      [5, "cat", 9]
+
+  """
+  def set(list) do
+    GenServer.cast(__MODULE__, {:set, list})
+  end
+
+  @doc """
+  Retrieve the item at the top of the stack.
+
+  ## Examples
+
+      iex> Stack.Server.pop
+      5
+
+  """
   def pop do
     GenServer.call(__MODULE__, :pop)
   end
 
+  @doc """
+  Push item on the top of the stack.
+
+  ## Examples
+
+      iex> Stack.Server.push "dog"
+      iex> Stack.Server.pop
+      "dog"
+
+  """
   def push(item) do
     GenServer.cast(__MODULE__, {:push, item})
   end
 
+  @doc """
+  Retrieve the contents of the stack without modifying it.
+
+  ## Examples
+
+      iex> Stack.Server.set [5, "cat", 9]
+      iex> Stack.Server.inspect
+      [5, "cat", 9]
+
+  """
   def inspect do
     GenServer.call(__MODULE__, :inspect)
   end
@@ -39,6 +82,10 @@ defmodule Stack.Server do
     { :reply, current_stack, {current_stack, stash_pid} }
   end
 
+  def handle_cast({:set, list}, {_current_stack, stash_pid}) do
+    Stack.Stash.save_stack(stash_pid, list)
+    { :noreply, {list, stash_pid} }
+  end
   def handle_cast({:push, item}, {current_stack, stash_pid}) do
     { :noreply, {[item|current_stack], stash_pid} }
   end
