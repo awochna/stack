@@ -16,8 +16,12 @@ defmodule Stack.Server do
     GenServer.cast(__MODULE__, {:push, item})
   end
 
+  def inspect do
+    GenServer.call(__MODULE__, :inspect)
+  end
+
   def dump do
-    GenServer.call(__MODULE__, :dump)
+    GenServer.call(__MODULE__, :inspect)
   end
 
   #####
@@ -31,7 +35,7 @@ defmodule Stack.Server do
   def handle_call(:pop, _from, {[head|tail], stash_pid}) do
     { :reply, head, {tail, stash_pid} }
   end
-  def handle_call(:dump, _from, {current_stack, stash_pid}) do
+  def handle_call(:inspect, _from, {current_stack, stash_pid}) do
     { :reply, current_stack, {current_stack, stash_pid} }
   end
 
