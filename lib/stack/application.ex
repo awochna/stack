@@ -1,7 +1,7 @@
 defmodule Stack.Application do
   use Application
 
-  def start(_type, _args) do
-    {:ok, _pid} = Stack.Supervisor.start_link([5, "cat", 9])
+  def start(_type, stack) do
+    {:ok, _pid} = Stack.Supervisor.start_link(stack)
   end
 end

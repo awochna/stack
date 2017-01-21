@@ -24,6 +24,6 @@ defmodule Stack.Stash do
   end
 
   def handle_cast({:save_stack, stack}, _current_stack) do
-    { :noreply, stack}
+    { :noreply, stack }
   end
 end

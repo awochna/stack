@@ -16,7 +16,7 @@ defmodule Stack.Mixfile do
   def application do
     # Specify extra applications you'll use from Erlang/Elixir
     [extra_applications: [:logger],
-     mod: {Stack.Application, []}]
+     mod: {Stack.Application, [5, "cat", 9]}]
   end
 
   # Dependencies can be Hex packages:
